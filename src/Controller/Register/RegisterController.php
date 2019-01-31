@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-
+// include_once(__DIR__."A");
 
 class RegisterController
 {
@@ -49,4 +49,25 @@ class RegisterController
         	]);
     	}
     }
+	
+	/**
+     * @Route("/testtt", methods={"GET"}, name="app_internations_post_test")
+     */
+
+	public function addUser(Request $request, APIUtils $utils){
+		// $payload = [
+		// 	'username' => $request->request->get('uname'),
+		// 	'password' => $request->request->get('pass'),
+		// 	'isAdmin'  => $request->request->get('isAdmin')
+		// ];
+		echo "$utils->sanitize()";
+	}
+
+	public function isNullable($data, $rejectList = []){
+
+		foreach($data as $key => $value){
+			
+		}
+	}
+
 }
