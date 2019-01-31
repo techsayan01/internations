@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\AdminGroupController;
+namespace App\Controller\AdminGroup;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;

@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * User
  *
- * @ORM\Table(name="user")
+ * @ORM\Table(name="user", indexes={@ORM\Index(name="audit_id", columns={"audit_id"})})
  * @ORM\Entity
  */
 class User
@@ -36,11 +36,14 @@ class User
     private $isAdmin = '0';
 
     /**
-     * @var int
+     * @var \Audit
      *
-     * @ORM\Column(name="audit_id", type="integer", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Audit")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="audit_id", referencedColumnName="audit_id")
+     * })
      */
-    private $auditId = '0';
+    private $audit;
 
     public function getUserId(): ?int
     {
@@ -71,14 +74,14 @@ class User
         return $this;
     }
 
-    public function getAuditId(): ?int
+    public function getAudit(): ?Audit
     {
-        return $this->auditId;
+        return $this->audit;
     }
 
-    public function setAuditId(int $auditId): self
+    public function setAudit(?Audit $audit): self
     {
-        $this->auditId = $auditId;
+        $this->audit = $audit;
 
         return $this;
     }

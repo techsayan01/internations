@@ -54,20 +54,20 @@ class RegisterController
      * @Route("/testtt", methods={"GET"}, name="app_internations_post_test")
      */
 
-	public function addUser(Request $request, APIUtils $utils){
-		// $payload = [
-		// 	'username' => $request->request->get('uname'),
-		// 	'password' => $request->request->get('pass'),
-		// 	'isAdmin'  => $request->request->get('isAdmin')
-		// ];
-		echo "$utils->sanitize()";
-	}
+	// public function addUser(Request $request, APIUtils $utils){
+	// 	// $payload = [
+	// 	// 	'username' => $request->request->get('uname'),
+	// 	// 	'password' => $request->request->get('pass'),
+	// 	// 	'isAdmin'  => $request->request->get('isAdmin')
+	// 	// ];
+	// 	echo "$utils->sanitize()";
+	// }
 
-	public function isNullable($data, $rejectList = []){
+	// public function isNullable($data, $rejectList = []){
 
-		foreach($data as $key => $value){
+	// 	foreach($data as $key => $value){
 			
-		}
-	}
+	// 	}
+	// }
 
 }
