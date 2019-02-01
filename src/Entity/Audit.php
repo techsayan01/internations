@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints\DateTime as DateTime;
 
 /**
  * Audit
@@ -24,10 +23,10 @@ class Audit
 
     /**
      * @var \DateTime
-     * @Gedmo\Timestampable(on="create")
-     * @ORM\Column(name="created_at", type="datetime")
+     *
+     * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="0000-00-00 00:00:00"})
      */
-    private $createdAt;
+    private $createdAt = '0000-00-00 00:00:00';
 
     /**
      * @var \DateTime
@@ -53,9 +52,9 @@ class Audit
         return $this->createdAt;
     }
 
-    public function setCreatedAt(): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
-        // $this->createdAt->modify("now");
+        $this->createdAt = $createdAt;
 
         return $this;
     }

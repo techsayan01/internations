@@ -3,15 +3,22 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Bridge\Doctrine\RegistryInterface;
+
 
 /**
  * User
  *
- * @ORM\Table(name="user", indexes={@ORM\Index(name="audit_id", columns={"audit_id"})})
+ * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="username", columns={"username"})}, indexes={@ORM\Index(name="audit_id", columns={"audit_id"})})
  * @ORM\Entity
  */
-class User
+class User extends ServiceEntityRepository
 {
+    public function __construct(RegistryInterface $registry)
+    {
+        parent::__construct($registry, User::class);
+    }
     /**
      * @var int
      *
@@ -86,5 +93,15 @@ class User
         return $this;
     }
 
+    public function checkAdmin($username = null){
+
+        if($username == null || $username == 0) return 2;
+        $qb = $this->createQueryBuilder('p')
+            ->andWhere('isAdmin = 0')
+            ->andWhere('username = $username')
+            ->getQuery();
+
+        return $qb->execute();
+    }
 
 }
