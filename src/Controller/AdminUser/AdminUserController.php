@@ -30,17 +30,22 @@ class AdminUserController extends AbstractController {
     	$request->getPreferredLanguage(['en']);
     	$request->headers->get('host');
 	    $request->headers->get('content-type');
-    	// $var = $request->request->get('test');
+
     	$payload = [
-			'username' => $request->request->get('uname'),
-			'isAdmin'  => $request->request->get('isAdmin')
+			'username' 		=> $request->request->get('uname'),
+			'isAdmin'  		=> $request->request->get('isAdmin'),
+			'adminUserName' => $request->request->get('adminUname')
 		];
 
-		$payload['isAdmin'] = (!empty($payload['isAdmin'])) ? $payload['isAdmin'] : 0;
-
 		$user = new User();
-		$audit = new Audit();
+		// $audit = new Audit();
 		$entityManager = $this->getDoctrine()->getManager();
+
+		//check the user requested to add is admin
+		$isAdmin = $user->checkIsAdmin($payload['adminUserName']);
+		echo json_encode($isAdmin); return;
+
+		$payload['isAdmin'] = (!empty($payload['isAdmin'])) ? $payload['isAdmin'] : 0;
 
     	try {
 
@@ -48,10 +53,10 @@ class AdminUserController extends AbstractController {
     		$user->setIsAdmin($payload['isAdmin']);
 
     		// $audit->setCreatedAt();
-			$audit->setIsDeleted(0);
+			// $audit->setIsDeleted(0);
 			
     		$entityManager ->persist($user);
-			$entityManager->persist($audit);
+			// $entityManager->persist($audit);
 
     		$entityManager->flush();
 
