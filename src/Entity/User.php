@@ -3,21 +3,17 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Validator\Constraints\DateTime;
+
 
 /**
  * User
  *
- * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="username", columns={"username"})}, indexes={@ORM\Index(name="IDX_8D93D649BD29F359", columns={"audit_id"})})
+ * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="username_UNIQUE", columns={"username"})})
  * @ORM\Entity
  */
-class User extends ServiceEntityRepository
+class User
 {
-    public function __construct(RegistryInterface $registry)
-    {
-        parent::__construct($registry, User::class);
-    }
     /**
      * @var int
      *
@@ -28,9 +24,9 @@ class User extends ServiceEntityRepository
     private $userId;
 
     /**
-     * @var string
+     * @var string|null
      *
-     * @ORM\Column(name="username", type="string", length=45, nullable=false)
+     * @ORM\Column(name="username", type="string", length=45, nullable=true)
      */
     private $username;
 
@@ -42,14 +38,31 @@ class User extends ServiceEntityRepository
     private $isAdmin = '0';
 
     /**
-     * @var \Audit
+     * @var \DateTime
      *
-     * @ORM\ManyToOne(targetEntity="Audit")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="audit_id", referencedColumnName="audit_id")
-     * })
+     * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="0000-00-00 00:00:00"})
      */
-    private $audit;
+    private $createdAt = '0000-00-00 00:00:00';
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated_at", type="datetime", nullable=false, options={"default"="CURRENT_TIMESTAMP"})
+     */
+    private $updatedAt = 'CURRENT_TIMESTAMP';
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
+     */
+    private $isDeleted = '0';
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
 
     public function getUserId(): ?int
     {
@@ -61,7 +74,7 @@ class User extends ServiceEntityRepository
         return $this->username;
     }
 
-    public function setUsername(string $username): self
+    public function setUsername(?string $username): self
     {
         $this->username = $username;
 
@@ -80,26 +93,35 @@ class User extends ServiceEntityRepository
         return $this;
     }
 
-    public function getAudit(): ?Audit
+    public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->audit;
+        return $this->createdAt;
     }
 
-    public function setAudit(?Audit $audit): self
+    public function setCreatedAt(\DateTime $createdAt): void
     {
-        $this->audit = $audit;
-
-        return $this;
+        $this->createdAt = $createdAt;
     }
 
-    public function checkIsAdmin($username = null){
-        if($username == null ) return 2;
-        $qb = $this->createQueryBuilder('p')
-            ->andWhere("username = $username")
-            ->andWhere('isAdmin = 1')
-            ->getQuery();
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
 
-        return $qb->execute();
+    public function setUpdatedAt(\DateTime $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    public function getIsDeleted(): ?bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): self
+    {
+        $this->isDeleted = $isDeleted;
+
         return $this;
     }
 

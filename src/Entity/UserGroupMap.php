@@ -36,11 +36,25 @@ class UserGroupMap
     private $userId;
 
     /**
-     * @var int
+     * @var \DateTime
      *
-     * @ORM\Column(name="audit_id", type="integer", nullable=false)
+     * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="0000-00-00 00:00:00"})
      */
-    private $auditId;
+    private $createdAt = '0000-00-00 00:00:00';
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="updated_at", type="string", length=45, nullable=true, options={"default"="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"})
+     */
+    private $updatedAt = 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
+
+    /**
+     * @var bool|null
+     *
+     * @ORM\Column(name="is_deleted", type="boolean", nullable=true)
+     */
+    private $isDeleted = '0';
 
     public function getUserGroupMapId(): ?int
     {
@@ -71,14 +85,38 @@ class UserGroupMap
         return $this;
     }
 
-    public function getAuditId(): ?int
+    public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->auditId;
+        return $this->createdAt;
     }
 
-    public function setAuditId(int $auditId): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
-        $this->auditId = $auditId;
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?string
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?string $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getIsDeleted(): ?bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(?bool $isDeleted): self
+    {
+        $this->isDeleted = $isDeleted;
 
         return $this;
     }

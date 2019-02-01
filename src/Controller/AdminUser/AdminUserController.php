@@ -13,8 +13,6 @@ use Symfony\Component\Validator\Constraints\DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\Entity\User;
-use App\Entity\Audit;
-
 
 
 /// Datetime update check
@@ -38,16 +36,14 @@ class AdminUserController extends AbstractController {
 			'adminUserName' => $request->request->get('adminUname')
 		];
 
-		// $user 	= new User();
-		$audit 	= new Audit();
+		$user 	= new User();
 		$date = new DateTime('now');
-// echo $date->format('Y-m-d H:i:s');
 
 		$entityManager = $this->getDoctrine()->getManager();
-        $audit->setIsDeleted(0);
+		$
+        $user->setIsDeleted(0);
 
-        // $audit->setCreatedAt();
-        $entityManager->persist($audit);
+        $entityManager->persist($user);
         $entityManager->flush();
         return new JsonResponse([
          		'success' => true,
