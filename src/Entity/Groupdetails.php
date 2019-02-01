@@ -5,12 +5,12 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Groupdetails
+ * GroupDetails
  *
- * @ORM\Table(name="groupDetails")
+ * @ORM\Table(name="group_details")
  * @ORM\Entity
  */
-class Groupdetails
+class GroupDetails
 {
     /**
      * @var int
@@ -29,11 +29,18 @@ class Groupdetails
     private $groupName;
 
     /**
-     * @var int
+     * @var int|null
      *
-     * @ORM\Column(name="audit_id", type="integer", nullable=false)
+     * @ORM\Column(name="audit_id", type="integer", nullable=true)
      */
     private $auditId;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
+     */
+    private $isDeleted = '0';
 
     public function getGroupId(): ?int
     {
@@ -57,9 +64,21 @@ class Groupdetails
         return $this->auditId;
     }
 
-    public function setAuditId(int $auditId): self
+    public function setAuditId(?int $auditId): self
     {
         $this->auditId = $auditId;
+
+        return $this;
+    }
+
+    public function getIsDeleted(): ?bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): self
+    {
+        $this->isDeleted = $isDeleted;
 
         return $this;
     }
