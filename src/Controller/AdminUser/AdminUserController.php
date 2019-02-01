@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\Entity\User;
@@ -37,9 +38,28 @@ class AdminUserController extends AbstractController {
 			'adminUserName' => $request->request->get('adminUname')
 		];
 
-		$user = new User();
-		// $audit = new Audit();
+		// $user 	= new User();
+		$audit 	= new Audit();
+		$date = new DateTime('now');
+// echo $date->format('Y-m-d H:i:s');
+
 		$entityManager = $this->getDoctrine()->getManager();
+        $audit->setIsDeleted(0);
+
+        // $audit->setCreatedAt();
+        $entityManager->persist($audit);
+        $entityManager->flush();
+        return new JsonResponse([
+         		'success' => true,
+            	'message'    => "Created successfully!" // Your data here
+        	]);;
+
+
+
+
+
+
+		$entityManager = $this->getDoctrine()->getRepository(User::class)->checkIsAdmin($payload['adminUserName']); return;
 
 		//check the user requested to add is admin
 		$isAdmin = $user->checkIsAdmin($payload['adminUserName']);

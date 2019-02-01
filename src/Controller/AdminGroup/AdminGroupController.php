@@ -38,7 +38,7 @@ class AdminGroupController extends AbstractController {
 		// $payload['isAdmin'] = (!empty($payload['isAdmin'])) ? $payload['isAdmin'] : 0;
 
 		$groupObject = new GroupDetails();
-		$entityManager = $this->getDoctrine()->getManager();
+		$entityManager = $this->getDoctrine()->getManager();        
 
     	try {
 
