@@ -28,82 +28,38 @@ class AdminUserController extends AbstractController {
     	$request->getPreferredLanguage(['en']);
     	$request->headers->get('host');
 	    $request->headers->get('content-type');
-
     	$payload = [
-			'username' 		=> $request->request->get('uname'),
-			'isAdmin'  		=> $request->request->get('isAdmin'),
-			'adminUserName' => $request->request->get('adminUname')
+			"username" 		=> $request->request->get("uname"),
+			"isAdmin"  		=> $request->request->get("isAdmin"),
+			"adminUserName" => $request->request->get("adminUname")
 		];
-
-		$user 	= new User();
-		$date   = new DateTime('now');
-
 		
-		//fetching objects from database
-
+        //Check if admin user or not
 		$isAdmin = $this->getDoctrine()
 		->getRepository(User::class)
-		->findByIsAdmin('admin'); 
-		// die;
-		// $isAdmin = $payload['username'];
-		var_dump($isAdmin); die;
-		// return new JsonResponse([
-  //        		'success' => true,
-  //           	'message' => "Created successfully!",
-  //           	'data'	  => $isAdmin
-  //       	]);
+		->findByIsAdmin($payload["adminUserName"]);
 
+        $responseArray = [
+            "success" => false,
+            "message"    => "Error Occoured! Only admin can add new user" // Your data here
+        ];
 
-	    
-		$entityManager = $this->getDoctrine()->getManager();
-		$user->setUsername($payload['username']);
-		$user->setIsAdmin(1);
-        $entityManager->persist($user);
-        $entityManager->flush();
-        return new JsonResponse([
-         		'success' => true,
-            	'message'    => "Created successfully!" // Your data here
-        	]);
+        if(!empty($isAdmin)) {
 
+            $entityManager = $this->getDoctrine()->getManager();
+            $user   = new User();
+            $date   = new DateTime("now");
+            
+            $user->setUsername($payload["username"]);
+            $user->setIsAdmin($payload["isAdmin"]);
+            $entityManager->persist($user);
+            $entityManager->flush();
 
+            $responseArray["success"] = true;
+            $responseArray["message"] = "User added successfully!";
+        }
 
-
-
-
-		// $entityManager = $this->getDoctrine()->getRepository(User::class)->checkIsAdmin($payload['adminUserName']); return;
-
-		//check the user requested to add is admin
-		$isAdmin = $user->checkIsAdmin($payload['adminUserName']);
-		echo json_encode($isAdmin); return;
-
-		$payload['isAdmin'] = (!empty($payload['isAdmin'])) ? $payload['isAdmin'] : 0;
-
-    	try {
-
-    		$user->setUsername($payload['username']);
-    		$user->setIsAdmin($payload['isAdmin']);
-
-    		// $audit->setCreatedAt();
-			// $audit->setIsDeleted(0);
-			
-    		$entityManager ->persist($user);
-			// $entityManager->persist($audit);
-
-    		$entityManager->flush();
-
-    		return new JsonResponse([
-         		'success' => true,
-            	'message'    => "Created successfully!" // Your data here
-        	]);
-    	}
-    	catch(\Exception $exception) {
-    		
-    		return new JsonResponse([
-            	'success' => false,
-            	'code'    => $exception->getCode(),
-            	'message' => $exception->getMessage(),
-        	]);
-    	}
+        return new JsonResponse($responseArray);
     }
 
 
@@ -112,7 +68,7 @@ class AdminUserController extends AbstractController {
      */
     public function deleteUser(Request $request){
 
-    	$request->getPreferredLanguage(['en']);
+    	$request->getPreferredLanguage(["en"]);
     	$request->headers->get('host');
 	    $request->headers->get('content-type');
     	$payload = [

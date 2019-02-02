@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * GroupDetails
  *
- * @ORM\Table(name="group_details")
+ * @ORM\Table(name="group_details", uniqueConstraints={@ORM\UniqueConstraint(name="group_name", columns={"group_name"})})
  * @ORM\Entity
  */
 class GroupDetails
@@ -29,11 +29,18 @@ class GroupDetails
     private $groupName;
 
     /**
-     * @var int|null
+     * @var \DateTime
      *
-     * @ORM\Column(name="audit_id", type="integer", nullable=true)
+     * @ORM\Column(name="created_at", type="datetime", nullable=false, options={"default"="0000-00-00 00:00:00"})
      */
-    private $auditId;
+    private $createdAt = '0000-00-00 00:00:00';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="updated_at", type="string", length=45, nullable=false, options={"default"="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"})
+     */
+    private $updatedAt = 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
 
     /**
      * @var bool
@@ -59,14 +66,26 @@ class GroupDetails
         return $this;
     }
 
-    public function getAuditId(): ?int
+    public function getCreatedAt(): ?\DateTimeInterface
     {
-        return $this->auditId;
+        return $this->createdAt;
     }
 
-    public function setAuditId(?int $auditId): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
-        $this->auditId = $auditId;
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?string
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(string $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

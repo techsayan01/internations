@@ -19,13 +19,14 @@ class UserRepository extends ServiceEntityRepository
      */
     public function findByIsAdmin($username = null): array
     {
-        $test = "p.username = " . $username;
+        $test = "p.username = '" . $username . "'";
         
-        // echo $username;
+        // echo $test; die;
         $qb = $this->createQueryBuilder('p')
-        		->andWhere('p.isAdmin = 1');
+                ->andWhere("$test");
         // var_dump($qb);
 
         return $qb->getQuery()->getResult();
+        // die("1111");
     }
 }
