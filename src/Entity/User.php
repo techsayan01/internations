@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints\DateTime;
  *
  * @ORM\Table(name="user", uniqueConstraints={@ORM\UniqueConstraint(name="username_UNIQUE", columns={"username"})})
  * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User
 {
@@ -124,6 +125,5 @@ class User
 
         return $this;
     }
-
 
 }

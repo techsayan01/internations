@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Controller\AdminUser;
-// use App\Controller\AdminUserController;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +11,7 @@ use Symfony\Component\Validator\Constraints\DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 
 
 /// Datetime update check
@@ -37,25 +36,41 @@ class AdminUserController extends AbstractController {
 		];
 
 		$user 	= new User();
-		$date = new DateTime('now');
+		$date   = new DateTime('now');
 
+		
+		//fetching objects from database
+
+		$isAdmin = $this->getDoctrine()
+		->getRepository(User::class)
+		->findByIsAdmin('admin'); 
+		// die;
+		// $isAdmin = $payload['username'];
+		var_dump($isAdmin); die;
+		// return new JsonResponse([
+  //        		'success' => true,
+  //           	'message' => "Created successfully!",
+  //           	'data'	  => $isAdmin
+  //       	]);
+
+
+	    
 		$entityManager = $this->getDoctrine()->getManager();
-		$
-        $user->setIsDeleted(0);
-
+		$user->setUsername($payload['username']);
+		$user->setIsAdmin(1);
         $entityManager->persist($user);
         $entityManager->flush();
         return new JsonResponse([
          		'success' => true,
             	'message'    => "Created successfully!" // Your data here
-        	]);;
+        	]);
 
 
 
 
 
 
-		$entityManager = $this->getDoctrine()->getRepository(User::class)->checkIsAdmin($payload['adminUserName']); return;
+		// $entityManager = $this->getDoctrine()->getRepository(User::class)->checkIsAdmin($payload['adminUserName']); return;
 
 		//check the user requested to add is admin
 		$isAdmin = $user->checkIsAdmin($payload['adminUserName']);
