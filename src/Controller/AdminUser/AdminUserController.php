@@ -13,12 +13,36 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\User;
 use App\Repository\UserRepository;
 
-
-/// Datetime update check
-
-
-
 class AdminUserController extends AbstractController {
+
+    private function getMessage($code = NULL){
+        $returnResult = false;
+        if($code != NULL || $code != ''){
+            $message = [
+                "401" => "Parameter mismatch",
+                "402" => "Content Not Found",
+                "403" => "Ran into exception",
+                "200" => "Success",
+                "201" => "Created Successfully",
+                "202" => "Successfully Updated",
+                "203" => "Successfully deleted"
+            ];
+            $returnResult = $message[$code];
+        }
+        return $returnResult;
+    }
+
+    private function isAdmin($username = NULL){
+        $returnResult = false;
+        if($username == NULL) return false;
+        else{
+          $isAdmin = $this->getDoctrine()
+                          ->getRepository(User::class)
+                          ->findByIsAdmin($username);  
+          $returnResult = $isAdmin ? true : false;
+        }
+        return $returnResult;
+    }
 
 	/**
      * @Route("/user/add", methods={"POST"}, name="app_internations_post_user_add")
@@ -35,9 +59,7 @@ class AdminUserController extends AbstractController {
 		];
 		
         //Check if admin user or not
-		$isAdmin = $this->getDoctrine()
-		->getRepository(User::class)
-		->findByIsAdmin($payload["adminUserName"]);
+		$this->isAdmin($payload['adminUname']);
 
         $responseArray = [
             "success" => false,
@@ -64,129 +86,96 @@ class AdminUserController extends AbstractController {
 
 
     /**
-     * @Route("/user/delete", methods={"POST"}, name="app_internations_post_user_delete")
-     */
-    public function deleteUser(Request $request){
-
-    	$request->getPreferredLanguage(["en"]);
-    	$request->headers->get('host');
-	    $request->headers->get('content-type');
-    	$payload = [
-			'user_ids' => $request->request->get('user_ids'),
-		];
-
-		$entityManager = $this->getDoctrine()->getManager();
-
-    	try {
-    		if(is_array($payload["user_ids"]) && $payload["user_ids"])
-    			foreach ($payload["user_ids"] as $ukey => $user_id) {
-
-    				$audit = new Audit();
-    				$audit->setCreatedAt("NOW()");
-    				$audit->setIsDeleted(1);
-    				$audit_id = $audit->getAuditId();
-    				
-    				$entityManager->persist($audit);
-    				$entityManager->flush();
-    				
-    				$user = $entityManager->getRepository(User::class)->find($user_id);
-    				$user->setAuditId($audit_id);
-    				$entityManager->persist($user);
-
-    				$entityManager->flush();
-    				
-    			}
-
-    		return new JsonResponse([
-         		'success' => true,
-            	'message'    => "Users deleted successfully!" // Your data here
-        	]);
-    	}
-    	catch(\Exception $exception) {
-    		
-    		return new JsonResponse([
-            	'success' => false,
-            	'code'    => $exception->getCode(),
-            	'message' => $exception->getMessage(),
-        	]);
-    	}
-    }
-
-
-    /**
-     * @Route("/user/all", methods={"GET"}, name="app_internations_post_user_all")
+     * @Route("/user/all", methods={"POST"}, name="app_internations_post_user_all")
      */
     public function allUser(Request $request){
 
     	$request->getPreferredLanguage(['en']);
-    	$request->headers->get('host');
 	    $request->headers->get('content-type');
 
-		$user = new User();
-		$entityManager = $this->getDoctrine()->getManager();
+        $setData = [];
+		$payload = [
+            "adminUser" => $request->request->get("adminUname")
+        ];
 
-    	try {
+        if($this->isAdmin($payload["adminUser"])){
+            $user = new User();
+            $userListObject = $this->getDoctrine()
+                          ->getRepository(User::class)
+                          ->findAll();
 
-  //   		$user->setUsername($payload['username']);
-  //   		$user->setIsAdmin($payload['isAdmin']);
+            //send the count of the user in the API. TODO
+            // $userCountObject = $this->getDoctrine()
+            //                     ->getRepository(User::class)
+            //                     ->count();
 
-  //   		$entityManager ->persist($user);
-  //   		$entityManager->flush();
-
-    		return new JsonResponse([
-         		'success' => true,
-            	'message'    => "User List",
-            	'data'    => [] // Your data here
-        	]);
-    	}
-    	catch(\Exception $exception) {
-    		
-    		return new JsonResponse([
-            	'success' => false,
-            	'code'    => $exception->getCode(),
-            	'message' => $exception->getMessage(),
-        	]);
-    	}
+            // var_dump($userCountObject); die;
+            foreach ($userListObject as $key => $value) {
+                if($value->getIsDeleted() == 0)
+                    $setData = [
+                        "userId"   => $value->getUserId(),
+                        "username" => $value->getUsername(),
+                        "createAt" => $value->getCreatedAt()
+                    ];
+            }
+            try {
+             
+              return new JsonResponse([
+                    'success' => true,
+                    'code'    => "200",
+                    'message' => $this->getMessage("200"),
+                    'data'    => $setData
+                ]);
+            }
+            catch(\Exception $exception) {
+                
+                return new JsonResponse([
+                    'success' => false,
+                    'code'    => $exception->getCode(),
+                    'message' => $exception->getMessage(),
+                    'data'    => $setData
+                ]);
+            }   
+        }
     }
-
 
     /**
-     * @Route("/user", methods={"POST"}, name="app_internations_post_user")
+     * @Route("/user/detail", methods={"POST"}, name="app_internations_post_user")
      */
-    public function user(Request $request){
+    public function userDetail(Request $request){
 
     	$request->getPreferredLanguage(['en']);
-    	$request->headers->get('host');
 	    $request->headers->get('content-type');
     	$payload = [
-			'user_id' => $request->request->get('user_id')
+			'username'     => $request->request->get("username"),
+            'adminUser'    => $request->request->get("adminUname") 
 		];
-
-		$user = new User();
-		$entityManager = $this->getDoctrine()->getManager();
-
-    	try {
-
-  //   		$user->setUsername($payload['username']);
-  //   		$user->setIsAdmin($payload['isAdmin']);
-
-  //   		$entityManager ->persist($user);
-  //   		$entityManager->flush();
-
-    		return new JsonResponse([
-         		'success' => true,
-            	'message'    => "User Details",
-            	'data'    => []
-        	]);
-    	}
-    	catch(\Exception $exception) {
-    		
-    		return new JsonResponse([
-            	'success' => false,
-            	'code'    => $exception->getCode(),
-            	'message' => $exception->getMessage(),
-        	]);
-    	}
-    }
-	
+   
+        if($this->isAdmin($payload['adminUser'])){
+    		$user       = new User();
+    		$userObject = $this->getDoctrine()
+                          ->getRepository(User::class)
+                          ->findByUsername($payload['username']);
+            $setData = count($userObject) ? $userObject[0] : false;
+            if($setData){  
+                try {
+                    return new JsonResponse([
+                        'success' => true,
+                        'code'    => "200",
+                        'message' => $this->getMessage("200"),
+                        'data'    => $setData
+                    ]);
+                }
+                catch(\Exception $exception) {
+                    
+                    return new JsonResponse([
+                        'success' => false,
+                        'code'    => $exception->getCode(),
+                        'message' => $exception->getMessage(),
+                        'data'    => $setData
+                    ]);
+                } 
+            }
+        }
+    }	
 }

@@ -19,16 +19,27 @@ class UserRepository extends ServiceEntityRepository
      */
     public function findByIsAdmin($username = null): ?bool
     {
+        $returnResult   = false;
         $whereCondition = "p.username = '" . $username . "'";
-        
+        if($username == null) return $returnResult;
         $qb = $this->createQueryBuilder('p')
-                ->where("$whereCondition");
-        $result = $qb->getQuery()->getResult();
-        foreach ($result as $key => $value) {
-            if($value['is_deleted'] == 0 && $value['is_admin'] == 1){
-                $boolResult = true;
-            }
+                   ->where("$whereCondition");
+        $queryObject = $qb->getQuery()->getResult();
+        $returnResult = ($queryObject[0]->getIsAdmin() == true && $queryObject[0]->getIsDeleted() == false) ? true : false;
+        return $returnResult; 
+    }
+
+    public function findByUsername($username = null): array
+    {
+        $returnResult   = false;
+        $whereCondition = "p.username = '" . $username . "'"; 
+        if($username == null) return $returnResult;
+        else{
+            $qb = $this->createQueryBuilder('p')
+                       ->where("$whereCondition");
+            $queryObject = $qb->getQuery()->getResult();
+            $returnResult = $queryObject[0]->getIsDeleted() ? $queryObject : false;
         }
-        return $boolResult; 
+        return $returnResult;   
     }
 }
