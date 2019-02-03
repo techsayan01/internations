@@ -21,7 +21,7 @@ class UserRepository extends ServiceEntityRepository
     {
         $test = "p.username = '" . $username . "'";
         
-        // echo $test; die;
+        echo $test; die;
         $qb = $this->createQueryBuilder('p')
                 ->andWhere("$test");
         // var_dump($qb);
