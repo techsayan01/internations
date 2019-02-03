@@ -115,7 +115,7 @@ class AdminUserController extends AbstractController {
 
 
     /**
-     * @Route("/user/all", methods={"GET"}, name="app_internations_post_user_all")
+     * @Route("/user/all", methods={"POST"}, name="app_internations_post_user_all")
      */
     public function allUser(Request $request){
 
@@ -127,6 +127,8 @@ class AdminUserController extends AbstractController {
             // "isAdmin"       => $request->request->get("isAdmin"),
             "adminUserName" => $request->request->get("adminUname")
         ];
+
+        // print_r($request->request->param('adminUname')); die;
         
         //Check if admin user or not
         $isAdmin = $this->getDoctrine()
