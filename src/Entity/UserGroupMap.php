@@ -45,7 +45,7 @@ class UserGroupMap
     /**
      * @var string|null
      *
-     * @ORM\Column(name="updated_at", type="string", length=45, nullable=true, options={"default"="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"})
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true, options={"default"="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"})
      */
     private $updatedAt = 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
 
@@ -54,7 +54,14 @@ class UserGroupMap
      *
      * @ORM\Column(name="is_deleted", type="boolean", nullable=true)
      */
+
     private $isDeleted = '0';
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
 
     public function getUserGroupMapId(): ?int
     {
