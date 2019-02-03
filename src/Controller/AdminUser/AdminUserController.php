@@ -63,54 +63,55 @@ class AdminUserController extends AbstractController {
     }
 
 
-    /**
-     * @Route("/user/delete", methods={"POST"}, name="app_internations_post_user_delete")
-     */
-    public function deleteUser(Request $request){
+      //   /**
+      //    * @Route("/user/delete", methods={"POST"}, name="app_internations_post_user_delete")
+      //    */
+      //   public function deleteUser(Request $request){
 
-    	$request->getPreferredLanguage(["en"]);
-    	$request->headers->get('host');
-	    $request->headers->get('content-type');
-    	$payload = [
-			'user_ids' => $request->request->get('user_ids'),
-		];
+      //   	$request->getPreferredLanguage(["en"]);
+      //   	$request->headers->get('host');
+    	 //    $request->headers->get('content-type');
+      //   	$payload = [
+    		// 	"user_ids" => $request->request->get("user_ids"),
+      //           "adminUserName" => $request->request->get("adminUname")
+    		// ];
 
-		$entityManager = $this->getDoctrine()->getManager();
+    		// $entityManager = $this->getDoctrine()->getManager();
 
-    	try {
-    		if(is_array($payload["user_ids"]) && $payload["user_ids"])
-    			foreach ($payload["user_ids"] as $ukey => $user_id) {
+      //   	try {
+      //   		if(is_array($payload["user_ids"]) && $payload["user_ids"])
+      //   			foreach ($payload["user_ids"] as $ukey => $user_id) {
 
-    				$audit = new Audit();
-    				$audit->setCreatedAt("NOW()");
-    				$audit->setIsDeleted(1);
-    				$audit_id = $audit->getAuditId();
-    				
-    				$entityManager->persist($audit);
-    				$entityManager->flush();
-    				
-    				$user = $entityManager->getRepository(User::class)->find($user_id);
-    				$user->setAuditId($audit_id);
-    				$entityManager->persist($user);
+      //   				$audit = new Audit();
+      //   				$audit->setCreatedAt("NOW()");
+      //   				$audit->setIsDeleted(1);
+      //   				$audit_id = $audit->getAuditId();
+        				
+      //   				$entityManager->persist($audit);
+      //   				$entityManager->flush();
+        				
+      //   				$user = $entityManager->getRepository(User::class)->find($user_id);
+      //   				$user->setAuditId($audit_id);
+      //   				$entityManager->persist($user);
 
-    				$entityManager->flush();
-    				
-    			}
+      //   				$entityManager->flush();
+        				
+      //   			}
 
-    		return new JsonResponse([
-         		'success' => true,
-            	'message'    => "Users deleted successfully!" // Your data here
-        	]);
-    	}
-    	catch(\Exception $exception) {
-    		
-    		return new JsonResponse([
-            	'success' => false,
-            	'code'    => $exception->getCode(),
-            	'message' => $exception->getMessage(),
-        	]);
-    	}
-    }
+      //   		return new JsonResponse([
+      //        		'success' => true,
+      //           	'message'    => "Users deleted successfully!" // Your data here
+      //       	]);
+      //   	}
+      //   	catch(\Exception $exception) {
+        		
+      //   		return new JsonResponse([
+      //           	'success' => false,
+      //           	'code'    => $exception->getCode(),
+      //           	'message' => $exception->getMessage(),
+      //       	]);
+      //   	}
+      //   }
 
 
     /**
@@ -118,75 +119,77 @@ class AdminUserController extends AbstractController {
      */
     public function allUser(Request $request){
 
-    	$request->getPreferredLanguage(['en']);
-    	$request->headers->get('host');
-	    $request->headers->get('content-type');
+        $request->getPreferredLanguage(['en']);
+        $request->headers->get('host');
+        $request->headers->get('content-type');
+        $payload = [
+            // "username"      => $request->request->get("uname"),
+            // "isAdmin"       => $request->request->get("isAdmin"),
+            "adminUserName" => $request->request->get("adminUname")
+        ];
+        
+        //Check if admin user or not
+        $isAdmin = $this->getDoctrine()
+        ->getRepository(User::class)
+        ->findByIsAdmin($payload["adminUserName"]);
 
-		$user = new User();
-		$entityManager = $this->getDoctrine()->getManager();
+        print_r($isAdmin); die;
+        $responseArray = [
+            "success" => false,
+            "message"    => "Error Occoured! Only admin can view all users" // Your data here
+        ];
 
-    	try {
+        if(!empty($isAdmin)) {
 
-  //   		$user->setUsername($payload['username']);
-  //   		$user->setIsAdmin($payload['isAdmin']);
+        $users = $this->getDoctrine()->getRepository(User::class);
+        
+        $responseArray["success"] = true;
+            $responseArray["user_data"] = $users;
+        }
 
-  //   		$entityManager ->persist($user);
-  //   		$entityManager->flush();
-
-    		return new JsonResponse([
-         		'success' => true,
-            	'message'    => "User List",
-            	'data'    => [] // Your data here
-        	]);
-    	}
-    	catch(\Exception $exception) {
-    		
-    		return new JsonResponse([
-            	'success' => false,
-            	'code'    => $exception->getCode(),
-            	'message' => $exception->getMessage(),
-        	]);
-    	}
+        return new JsonResponse($responseArray);
+    
     }
 
 
     /**
      * @Route("/user", methods={"POST"}, name="app_internations_post_user")
      */
-    public function user(Request $request){
+  //   public function user(Request $request){
 
-    	$request->getPreferredLanguage(['en']);
-    	$request->headers->get('host');
-	    $request->headers->get('content-type');
-    	$payload = [
-			'user_id' => $request->request->get('user_id')
-		];
+  //   	$request->getPreferredLanguage(['en']);
+  //   	$request->headers->get('host');
+	 //    $request->headers->get('content-type');
+  //   	$payload = [
+		// 	'user_id' => $request->request->get('user_id')
+		// ];
 
-		$user = new User();
-		$entityManager = $this->getDoctrine()->getManager();
+		// $user = new User();
+		// $entityManager = $this->getDoctrine()->getManager();
 
-    	try {
+  //   	try {
 
-  //   		$user->setUsername($payload['username']);
-  //   		$user->setIsAdmin($payload['isAdmin']);
+  //         //   		$user->setUsername($payload['username']);
+  //         //   		$user->setIsAdmin($payload['isAdmin']);
 
-  //   		$entityManager ->persist($user);
-  //   		$entityManager->flush();
+  //         //   		$entityManager ->persist($user);
+  //         //   		$entityManager->flush();
 
-    		return new JsonResponse([
-         		'success' => true,
-            	'message'    => "User Details",
-            	'data'    => []
-        	]);
-    	}
-    	catch(\Exception $exception) {
+  //   		return new JsonResponse([
+  //        		'success' => true,
+  //           	'message'    => "User Details",
+  //           	'data'    => []
+  //       	]);
+  //   	}
+  //   	catch(\Exception $exception) {
     		
-    		return new JsonResponse([
-            	'success' => false,
-            	'code'    => $exception->getCode(),
-            	'message' => $exception->getMessage(),
-        	]);
-    	}
-    }
+  //   		return new JsonResponse([
+  //           	'success' => false,
+  //           	'code'    => $exception->getCode(),
+  //           	'message' => $exception->getMessage(),
+  //       	]);
+  //   	}
+  //   }
 	
 }
+

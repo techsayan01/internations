@@ -25,11 +25,14 @@ class UserRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('p')
                 ->where("$whereCondition");
         $result = $qb->getQuery()->getResult();
-        foreach ($result as $key => $value) {
+        $boolResult = false;
+
+        if(!empty($result)) foreach ($result as $key => $value) {
             if($value['is_deleted'] == 0 && $value['is_admin'] == 1){
                 $boolResult = true;
             }
         }
+
         return $boolResult; 
     }
 }
