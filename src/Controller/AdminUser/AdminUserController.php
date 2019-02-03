@@ -84,7 +84,6 @@ class AdminUserController extends AbstractController {
         return new JsonResponse($responseArray);
     }
 
-
     /**
      * @Route("/user/all", methods={"POST"}, name="app_internations_post_user_all")
      */

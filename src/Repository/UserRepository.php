@@ -21,6 +21,7 @@ class UserRepository extends ServiceEntityRepository
     {
         $returnResult   = false;
         $whereCondition = "p.username = '" . $username . "'";
+<<<<<<< HEAD
         if($username == null) return $returnResult;
         $qb = $this->createQueryBuilder('p')
                    ->where("$whereCondition");
@@ -41,5 +42,21 @@ class UserRepository extends ServiceEntityRepository
             $returnResult = $queryObject[0]->getIsDeleted() ? $queryObject : false;
         }
         return $returnResult;   
+=======
+        
+        // echo $test; die;
+        $qb = $this->createQueryBuilder('p')
+                ->where("$whereCondition");
+        $result = $qb->getQuery()->getResult();
+        $boolResult = false;
+
+        if(!empty($result)) foreach ($result as $key => $value) {
+            if($value['is_deleted'] == 0 && $value['is_admin'] == 1){
+                $boolResult = true;
+            }
+        }
+
+        return $boolResult; 
+>>>>>>> a9b15d3deb4b5521da88146f870ac30afed653f3
     }
 }
