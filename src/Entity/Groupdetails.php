@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="group_details", uniqueConstraints={@ORM\UniqueConstraint(name="group_name", columns={"group_name"})})
  * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\GroupDetailsRepository")
  */
 class GroupDetails
 {
@@ -71,11 +72,9 @@ class GroupDetails
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getUpdatedAt(): ?string
@@ -83,11 +82,9 @@ class GroupDetails
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(string $updatedAt): self
+    public function setUpdatedAt(\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
     }
 
     public function getIsDeleted(): ?bool
