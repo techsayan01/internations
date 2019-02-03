@@ -92,50 +92,47 @@ class AdminUserController extends AbstractController {
     	$request->getPreferredLanguage(['en']);
 	    $request->headers->get('content-type');
 
-        $setData = [];
-		$payload = [
+      $setData = [];
+		  $payload = [
             "adminUser" => $request->request->get("adminUname")
-        ];
-
-        if($this->isAdmin($payload["adminUser"])){
-            $user = new User();
-            $userListObject = $this->getDoctrine()
+      ];
+      if($this->isAdmin($payload["adminUser"])){
+        $user = new User();
+        $userListObject = $this->getDoctrine()
                           ->getRepository(User::class)
                           ->findAll();
-
             //send the count of the user in the API. TODO
             // $userCountObject = $this->getDoctrine()
             //                     ->getRepository(User::class)
             //                     ->count();
 
             // var_dump($userCountObject); die;
-            foreach ($userListObject as $key => $value) {
-                if($value->getIsDeleted() == 0)
-                    $setData = [
-                        "userId"   => $value->getUserId(),
-                        "username" => $value->getUsername(),
-                        "createAt" => $value->getCreatedAt()
-                    ];
-            }
-            try {
-             
+          foreach ($userListObject as $key => $value) {
+              if($value->getIsDeleted() == 0)
+                  $setData = [
+                      "userId"   => $value->getUserId(),
+                      "username" => $value->getUsername(),
+                      "createAt" => $value->getCreatedAt()
+                  ];
+          }
+          try { 
+            return new JsonResponse([
+                  'success' => true,
+                  'code'    => "200",
+                  'message' => $this->getMessage("200"),
+                  'data'    => $setData
+              ]);
+          }
+          catch(\Exception $exception) {
+              
               return new JsonResponse([
-                    'success' => true,
-                    'code'    => "200",
-                    'message' => $this->getMessage("200"),
-                    'data'    => $setData
-                ]);
-            }
-            catch(\Exception $exception) {
-                
-                return new JsonResponse([
-                    'success' => false,
-                    'code'    => $exception->getCode(),
-                    'message' => $exception->getMessage(),
-                    'data'    => $setData
-                ]);
-            }   
-        }
+                  'success' => false,
+                  'code'    => $exception->getCode(),
+                  'message' => $exception->getMessage(),
+                  'data'    => $setData
+              ]);
+          }   
+      }
     }
 
     /**
@@ -146,10 +143,10 @@ class AdminUserController extends AbstractController {
     	$request->getPreferredLanguage(['en']);
 	    $request->headers->get('content-type');
     	$payload = [
-			'username'     => $request->request->get("username"),
+			     'username'     => $request->request->get("username"),
             'adminUser'    => $request->request->get("adminUname") 
-		];
-   
+		        ];
+            
         if($this->isAdmin($payload['adminUser'])){
     		$user       = new User();
     		$userObject = $this->getDoctrine()
