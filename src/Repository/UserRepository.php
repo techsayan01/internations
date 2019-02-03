@@ -17,15 +17,18 @@ class UserRepository extends ServiceEntityRepository
      * @param $username
      * @return boolean
      */
-    public function findByIsAdmin($username = null): array
+    public function findByIsAdmin($username = null): ?bool
     {
-        //string conversion
-        $where = 'p.username = ' ."'$username'";
-        // echo $username;
+        $whereCondition = "p.username = '" . $username . "'";
+        
         $qb = $this->createQueryBuilder('p')
-        		->andWhere($where);
-        // var_dump($qb);
-
-        return $qb->getQuery()->getResult();
+                ->where("$whereCondition");
+        $result = $qb->getQuery()->getResult();
+        foreach ($result as $key => $value) {
+            if($value['is_deleted'] == 0 && $value['is_admin'] == 1){
+                $boolResult = true;
+            }
+        }
+        return $boolResult; 
     }
 }

@@ -35,7 +35,7 @@ class AdminGroupController extends AbstractController {
 		$entityManager = $this->getDoctrine()->getManager();
         $isAdmin = $this->getDoctrine()
         ->getRepository(User::class)
-        ->findByIsAdmin("'admin'");
+        ->findByIsAdmin('admin');
         var_dump($isAdmin); die; 
 
     	try {
