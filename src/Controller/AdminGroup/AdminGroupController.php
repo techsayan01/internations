@@ -13,6 +13,15 @@ use App\Entity\GroupDetails;
 use App\Entity\User;
 use App\Entity\UserGroupMap;
 
+/**
+* This controller handles all the group related operations for the application
+* The different operations are as follows : 
+* 1. creating a group -> createGroup(Request)
+* 2. Add user to group -> addUserToGroup(Request)
+* 3. Delete user from a group (soft delete) -> deleteUserFromGroup(Request)
+* 4. Removing a group if no users are present -> deleteGroup(Request)
+*/
+
 class AdminGroupController extends AbstractController {
 	
     //method to have one place for all the custom messages and codes
@@ -28,8 +37,8 @@ class AdminGroupController extends AbstractController {
                 "201" => "Successfully Updated",
                 "202" => "Successfully deleted",
                 "203" => "User not present",
-                "204" => "Group Deleted"
-                "205" => "Group can't be deleted, user present"
+                "204" => "Group Deleted",
+                "205" => "Group cannot be deleted, user present"
             ];
             $returnResult = $message[$code];
         }
@@ -252,11 +261,11 @@ class AdminGroupController extends AbstractController {
         else{
             $code = 401;
         }
-        try {                   
+        try {   
                 return new JsonResponse([
                     'success' => true,
                     'code'    => $code,
-                    'message' => $this->message($message),
+                    'message' => $this->message($code),
                     'data'    => $setData  
                 ]);
             }
@@ -265,7 +274,7 @@ class AdminGroupController extends AbstractController {
                 return new JsonResponse([
                     'success' => false,
                     'code'    => 402,
-                    'message' => $exception->getMessage(),
+                    'message' => $this->getMessage(),
                     'data'    => $setData
                 ]);
             }

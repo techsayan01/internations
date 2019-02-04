@@ -13,6 +13,15 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\User;
 use App\Repository\UserRepository;
 
+/**
+* This controller handles all the user related operations for the application
+* The different operations are as follows : 
+* 1. Adding a user if the requesting user is admin [POST] -> addUser(Request)
+* 2. View all users if the requesting user is admin [POST] -> allUser(Request)
+* 3. View the user creation time if the requesting user is admin [POST]  -> userDetail(Request)
+* 4. Delete a user if the requesting user is admin [POST] -> deleteUser(Request)
+*/
+
 class AdminUserController extends AbstractController {
 
     //method to have one place for all the custom messages and codes
