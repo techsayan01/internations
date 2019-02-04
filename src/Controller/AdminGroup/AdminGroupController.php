@@ -24,7 +24,10 @@ class AdminGroupController extends AbstractController {
                 "403" => "Ran into exception",
                 "200" => "Created Successfully",
                 "201" => "Successfully Updated",
-                "202" => "Successfully deleted"
+                "202" => "Successfully deleted",
+                "203" => "User not present",
+                "204" => "Group Deleted"
+                "205" => "Group can't be deleted, user present"
             ];
             $returnResult = $message[$code];
         }
@@ -37,8 +40,9 @@ class AdminGroupController extends AbstractController {
         else{
           $isAdmin = $this->getDoctrine()
                           ->getRepository(User::class)
-                          ->findByIsAdmin($username);  
-          $returnResult = $isAdmin ? true : false;
+                          ->findByIsAdmin($username); 
+                          // var_dump($isAdmin); die; 
+          $returnResult = $isAdmin[0]->getIsDeleted();
         }
         return $returnResult;
     }
@@ -138,12 +142,68 @@ class AdminGroupController extends AbstractController {
             }
         }
     }
-
+    
     /**
-     * @Route("/group/view/member", methods={"POST"}, name="app_internations_post_group_add")
+     * @Route("/group/remove/user/", methods={"POST"}, name="app_internations_post_group_user_remove")
      */
 
-    public function viewMembersInGroup(Request $request){
+    public function deleteUserFromGroup(Request $request){
+        $request->getPreferredLanguage(['en']);
+        $request->headers->get('content-type');
+        $setData = [];
+
+        $payload = [
+            'groupName'   => $request->request->get('groupName'),
+            'adminUname'  => $request->request->get('adminUname'),
+            'username'    => $request->request->get('uname')
+        ];
+
+        $user = $this->getDoctrine()
+                        ->getRepository(User::class)
+                        ->findByUsername($payload['username']);
+        $group = $this->getDoctrine()
+                        ->getRepository(GroupDetails::class)
+                        ->findByGroup($payload['groupName']);
+
+        if($user->getUsername() != null && $this->isAdmin($payload["adminUname"]) == true && $group[0]->getIsDeleted() == false ){
+            $entityManager = $this->getDoctrine()->getManager();
+            $userGroupMap = $this->getDoctrine()
+                        ->getRepository(UserGroupMap::class)
+                        ->findByUserAndGroup($user->getUserId(), $group[0]->getGroupId());
+            $userGroupMap[0]->setIsDeleted(1);
+            $entityManager->persist($userGroupMap[0]);
+            $entityManager->flush();
+            $code = 201;
+        }
+        else{
+            $code = 203;
+        }
+        try {                   
+                return new JsonResponse([
+                    'success' => true,
+                    'code'    => $code,
+                    'message' => $this->message($code),
+                    'data'    => $setData  
+                ]);
+            }
+            catch(\Exception $exception) {
+                
+                return new JsonResponse([
+                    'success' => false,
+                    'code'    => 402,
+                    'message' => $exception->getMessage(),
+                    'data'    => $setData
+                ]);
+            }
+
+    }
+
+    /**
+     * @Route("/group/delete/", methods={"POST"}, name="app_internations_post_group_remove")
+     */
+
+
+    public function deleteGroup(Request $request){
         $request->getPreferredLanguage(['en']);
         $request->headers->get('content-type');
         $setData = [];
@@ -152,9 +212,51 @@ class AdminGroupController extends AbstractController {
             'groupName'   => $request->request->get('groupName'),
             'adminUname'  => $request->request->get('adminUname')
         ];
-        $groupObject    = new GroupDetails();
-        $userObject     = new User();
-        
 
+        $group = $this->getDoctrine()
+                        ->getRepository(GroupDetails::class)
+                        ->findByGroup($payload['groupName']);
+
+        if($this->isAdmin($payload["adminUname"]) && $group[0]->getGroupName() != null && ($group[0]->getIsDeleted() == 0 || $group[0]->getIsDeleted() == false) ){
+
+            $groupMap = $this->getDoctrine()
+                        ->getRepository(UserGroupMap::class)
+                        ->countByGroup($group[0]->getGroupId());
+
+            //delete the group if the count of users = 0
+
+            if($groupMap[0]['count'] == 0){
+
+                $group[0]->setIsDeleted(1);
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($group[0]);
+                $entityManager->flush();
+                $code = 204;
+            }
+            else{
+                $code = 205;
+            }
+        }
+        else{
+            $code = 401;
+        }
+        try {                   
+                return new JsonResponse([
+                    'success' => true,
+                    'code'    => $code,
+                    'message' => $this->message($message),
+                    'data'    => $setData  
+                ]);
+            }
+            catch(\Exception $exception) {
+                
+                return new JsonResponse([
+                    'success' => false,
+                    'code'    => 402,
+                    'message' => $exception->getMessage(),
+                    'data'    => $setData
+                ]);
+            }
     }
+
 }

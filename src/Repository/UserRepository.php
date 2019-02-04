@@ -12,12 +12,11 @@ class UserRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, User::class);
     }
-
     /**
      * @param $username
      * @return boolean
      */
-    public function findByIsAdmin($username = null): ?bool
+    public function findByIsAdmin($username = null)
     {
         $returnResult   = false;
         $whereCondition = "p.username = '" . $username . "'";
@@ -25,8 +24,7 @@ class UserRepository extends ServiceEntityRepository
         else{
             $qb = $this->createQueryBuilder('p')
                        ->where("$whereCondition");
-            $queryObject = $qb->getQuery()->getResult();
-            $returnResult = ($queryObject[0]->getIsAdmin() == true && $queryObject[0]->getIsDeleted() == false) ? true : false; 
+            $returnResult = $queryObject = $qb->getQuery()->getResult();
         }
        return $returnResult;
     }
@@ -42,7 +40,6 @@ class UserRepository extends ServiceEntityRepository
                        ->where("$whereCondition")
                        ->andWhere("p.isDeleted = 0");
             $queryObject = $qb->getQuery()->getResult();
-            // var_dump($queryObject); die;
             $returnResult = $queryObject[0];
         }
         return $returnResult;   

@@ -3,12 +3,14 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * UserGroupMap
  *
  * @ORM\Table(name="user_group_map")
  * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repository\UserGroupMapRepository")
  */
 class UserGroupMap
 {
@@ -97,11 +99,9 @@ class UserGroupMap
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(\DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getUpdatedAt(): ?string
@@ -109,11 +109,9 @@ class UserGroupMap
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?string $updatedAt): self
+    public function setUpdatedAt(?DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
     }
 
     public function getIsDeleted(): ?bool
@@ -127,6 +125,5 @@ class UserGroupMap
 
         return $this;
     }
-
 
 }

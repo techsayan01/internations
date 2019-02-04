@@ -16,11 +16,18 @@ class GroupDetailsRepository extends ServiceEntityRepository
      * @param $username
      * @return boolean
      */
-    public function findByIsAdmin($username = null): array
+    public function findByGroup($groupName = null)
     {
-        //converting the 
-        $qb = $this->createQueryBuilder('p')
-        		->andWhere('p.isAdmin = :username');
-        return $qb->getQuery()->getResult();
+        //converting the
+        $returnResult = false;
+        $whereCondition = "p.groupName = '" . $groupName . "'";
+        if($groupName == null) return $returnResult;
+        else{
+            $qb = $this->createQueryBuilder('p')
+                       ->where("$whereCondition");
+            $queryObject = $qb->getQuery()->getResult();
+            $returnResult = $queryObject;
+        }
+       return $returnResult;
     }
 }

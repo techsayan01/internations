@@ -25,8 +25,7 @@ class AdminUserController extends AbstractController {
                 "200" => "Success",
                 "201" => "Created Successfully",
                 "202" => "Successfully Updated",
-                "203" => "Successfully deleted",
-                "300" => "User already present"
+                "203" => "Successfully deleted"
             ];
             $returnResult = $message[$code];
         }
@@ -40,7 +39,7 @@ class AdminUserController extends AbstractController {
           $isAdmin = $this->getDoctrine()
                           ->getRepository(User::class)
                           ->findByIsAdmin($username);  
-          $returnResult = $isAdmin ? true : false;
+          $returnResult = $isAdmin[0]->getIsDeleted() ? false : true;
         }
         return $returnResult;
     }
@@ -263,7 +262,5 @@ class AdminUserController extends AbstractController {
                     'data'    => $setData
                 ]);
             }
-
-
     }
 }
