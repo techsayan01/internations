@@ -15,6 +15,8 @@ use App\Repository\UserRepository;
 
 class AdminUserController extends AbstractController {
 
+    //method to have one place for all the custom messages and codes
+    //TODO export this method to a class and access it through that class, code reuseability
     private function getMessage($code = NULL){
         $returnResult = false;
         if($code != NULL || $code != ''){
@@ -32,6 +34,8 @@ class AdminUserController extends AbstractController {
         return $returnResult;
     }
 
+   //Checks if the user is admin (needed to reduce uncessary code from the API endpoint/controllers)
+
     private function isAdmin($username = NULL){
         $returnResult = false;
         if($username == NULL) return false;
@@ -44,6 +48,7 @@ class AdminUserController extends AbstractController {
         return $returnResult;
     }
 
+    #TODO optimize the code by reusing methods
 	   /**
      * @Route("/user/add", methods={"POST"}, name="app_internations_post_user_add")
      */
@@ -69,7 +74,7 @@ class AdminUserController extends AbstractController {
       }
 
       else{
-        //Check if admin user or not
+        //Check if admin user
   		  if($this->isAdmin($payload['adminUserName']) && ($payload["username"] != null || $payload["username"] == '' ) ){
           $user   = new User();
           $entityManager = $this->getDoctrine()->getManager();
@@ -126,12 +131,8 @@ class AdminUserController extends AbstractController {
         $userListObject = $this->getDoctrine()
                           ->getRepository(User::class)
                           ->findAll();
-            //send the count of the user in the API. TODO
-            // $userCountObject = $this->getDoctrine()
-            //                     ->getRepository(User::class)
-            //                     ->count();
 
-            // var_dump($userCountObject); die;
+          //loop through the userListObject to fetch all the users for the admin
           foreach ($userListObject as $key => $value) {
               if($value->getIsDeleted() == 0)
                   $setData = [
@@ -160,6 +161,8 @@ class AdminUserController extends AbstractController {
       }
     }
 
+    #TODO write the proper else condition to reduce API errors
+
     /**
      * @Route("/user/detail", methods={"POST"}, name="app_internations_post_user")
      */
@@ -172,13 +175,14 @@ class AdminUserController extends AbstractController {
             'adminUser'    => $request->request->get("adminUname") 
 		        ];
       $setData = [];
+
+      //check the details of the user if the requested user is admin
       if($this->isAdmin($payload['adminUser'])){
   		$user       = new User();
   		$userObject = $this->getDoctrine()
                         ->getRepository(User::class)
                         ->findByUsername($payload['username']);
       $setData = count($userObject) ? $userObject[0] : false;
-      // if($setData){  
             try {
                 return new JsonResponse([
                     'success' => true,
@@ -196,11 +200,10 @@ class AdminUserController extends AbstractController {
                     'data'    => $setData
                 ]);
             } 
-        // }
-        // else    // }
       }
     }
 
+    #TODO optimize the reusability factor in this method
     /**
      * @Route("/user/delete", methods={"POST"}, name="app_internations_post_user")
      */
@@ -218,17 +221,11 @@ class AdminUserController extends AbstractController {
         $user = $this->getDoctrine()
                         ->getRepository(User::class)
                         ->findByUsername($payload['username']);
-        // var_dump($user); die;
-        // $result = count($user) > 0 ? true : false;
         if(!is_null($user)){
             $entityManager = $this->getDoctrine()->getManager();
             $user->setIsDeleted(1);
             $entityManager->persist($user);
             $entityManager->flush();
-            // $userObject = new User();
-            // $user = $this->getDoctrine()
-            //             ->getRepository(User::class)
-            //             ->deleteUser($payload['username']);
             $setData = [
               "isDeleted" => $user->getUsername()
             ];

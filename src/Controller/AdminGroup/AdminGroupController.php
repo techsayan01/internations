@@ -15,6 +15,8 @@ use App\Entity\UserGroupMap;
 
 class AdminGroupController extends AbstractController {
 	
+    //method to have one place for all the custom messages and codes
+    //TODO export this method to a class and access it through that class, code reuseability
     private function message($code = NULL){
         $returnResult = false;
         if($code != NULL || $code != ''){
@@ -33,6 +35,8 @@ class AdminGroupController extends AbstractController {
         }
         return $returnResult;
     }
+
+    //Checks if the user is admin (needed to reduce uncessary code from the API endpoint/controllers)
 
     private function isAdmin($username = NULL){
         $returnResult = false;
@@ -64,6 +68,8 @@ class AdminGroupController extends AbstractController {
 
 		$groupObject    = new GroupDetails();
         $userObject     = new User();
+
+        //check the user is admin
         if($this->isAdmin($payload['adminUname'])){
             try {
                 $groupObject->setGroupName($payload['groupName']);
@@ -89,8 +95,10 @@ class AdminGroupController extends AbstractController {
         }
     }
 
+    #TODO write the else condition for method and optimize the code to reduce API errors
+
     /**
-     * @Route("/group/addUser", methods={"POST"}, name="app_internations_post_group_addUser")
+     * @Route("/group/addUser", methods={"POST"}, name="app_internations_post_group_add_user")
      */
 
     public function addUserToGroup(Request $request){
@@ -115,6 +123,9 @@ class AdminGroupController extends AbstractController {
                         ->getRepository(GroupDetails::class)
                         ->findBy(['groupName' => $payload['groupName']]);
         $groupId = count($groupMap) > 0 ? $groupMap[0]->getGroupId() : false;
+
+        //check userID, groupID is present in the table and the user is admin
+
         if($userId && $groupId && $this->isAdmin($payload['adminUname'])){
             $userGroupMap->setGroupId($groupId);
             $userGroupMap->setUserId($userId);
@@ -142,7 +153,7 @@ class AdminGroupController extends AbstractController {
             }
         }
     }
-    
+
     /**
      * @Route("/group/remove/user/", methods={"POST"}, name="app_internations_post_group_user_remove")
      */
@@ -165,6 +176,7 @@ class AdminGroupController extends AbstractController {
                         ->getRepository(GroupDetails::class)
                         ->findByGroup($payload['groupName']);
 
+        //check the user persists in the DB and is not deleted also
         if($user->getUsername() != null && $this->isAdmin($payload["adminUname"]) == true && $group[0]->getIsDeleted() == false ){
             $entityManager = $this->getDoctrine()->getManager();
             $userGroupMap = $this->getDoctrine()

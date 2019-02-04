@@ -12,16 +12,7 @@ class UserGroupMapRepository extends ServiceEntityRepository
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, UserGroupMap::class);
-        // die("1111");
     }
-
-    // public function getMembersInGroup($groupName = null){
-    // 	$returnResult   = false;
-    // 	if($groupName == null) return $returnResult;
-    // 	else{
-    		
-    // 	}
-    // }
     public function countByGroup($groupId = null){
         $returnResult = null;
         $whereCondition = "p.groupId = '" . $groupId . "'";
@@ -36,7 +27,6 @@ class UserGroupMapRepository extends ServiceEntityRepository
                     ->groupBy("$groupByCondition");
 
             $returnResult = $queryObject = $qb->getQuery()->getResult();
-            // var_dump($returnResult); die;
         }
        return $returnResult;
     }
