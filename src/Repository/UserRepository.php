@@ -40,9 +40,9 @@ class UserRepository extends ServiceEntityRepository
         else{
             $qb = $this->createQueryBuilder('p')
                        ->where("$whereCondition")
-                       ->andWhere("p.is_deleted = 0");
+                       ->andWhere("p.isDeleted = 0");
             $queryObject = $qb->getQuery()->getResult();
-            var_dump($queryObject); die;
+            // var_dump($queryObject); die;
             $returnResult = $queryObject[0];
         }
         return $returnResult;   

@@ -25,7 +25,8 @@ class AdminUserController extends AbstractController {
                 "200" => "Success",
                 "201" => "Created Successfully",
                 "202" => "Successfully Updated",
-                "203" => "Successfully deleted"
+                "203" => "Successfully deleted",
+                "300" => "User already present"
             ];
             $returnResult = $message[$code];
         }
@@ -57,36 +58,57 @@ class AdminUserController extends AbstractController {
 			     "isAdmin"  		=> $request->request->get("isAdmin"),
 			     "adminUserName" => $request->request->get("adminUname")
 		  ];
+      $setData = [];
 
-      //Check if admin user or not
-		  if($this->isAdmin($payload['adminUname']) && ($payload["username"] != null || $payload["username"] == '' ) ){
-        $user   = new User();
-        $entityManager = $this->getDoctrine()->getManager();
-        
-        $user->setUsername($payload["username"]);
-        $user->setIsAdmin(($payload["isAdmin"] == 1 || $payload["isAdmin"] == true) ? true : false );
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        try { 
-            return new JsonResponse([
+      if(!isset($payload["username"]) || !isset($payload["adminUserName"])){
+        return new JsonResponse([
                   'success' => true,
-                  'code'    => "200",
-                  'message' => $this->getMessage("200"),
+                  'code'    => "401",
+                  'message' => $this->getMessage("401"),
                   'data'    => $setData
               ]);
+      }
+
+      else{
+        //Check if admin user or not
+  		  if($this->isAdmin($payload['adminUserName']) && ($payload["username"] != null || $payload["username"] == '' ) ){
+          $user   = new User();
+          $entityManager = $this->getDoctrine()->getManager();
+          
+          $user = $this->getDoctrine()
+                        ->getRepository(User::class)
+                        ->findByUsername($payload['username']);
+          if($user->getUsername() != null ){
+            $user->setUsername($payload["username"]);
+            $user->setIsAdmin((isset($payload["isAdmin"]) && ($payload["isAdmin"] == 1 || $payload["isAdmin"] == "true") ) ? true : false );
+            $entityManager->persist($user);
+            $entityManager->flush();
           }
-          catch(\Exception $exception) {
-              
+          else{
+            // die;
+            $message = "Already present"; 
+          }
+
+          try { 
               return new JsonResponse([
-                  'success' => false,
-                  'code'    => "403",
-                  'message' => $exception->getMessage(),
-                  'data'    => $setData
-              ]);
-           }   
+                    'success' => true,
+                    'code'    => "200",
+                    'message' => !isset($message) ? $this->getMessage("200") : $message,
+                    'data'    => $setData
+                ]);
+            }
+            catch(\Exception $exception) {
+                
+                return new JsonResponse([
+                    'success' => false,
+                    'code'    => "403",
+                    'message' => $exception->getMessage(),
+                    'data'    => $setData
+                ]);
+             }   
+          }
         }
-    }
+      }
 
     /**
      * @Route("/user/all", methods={"POST"}, name="app_internations_post_user_all")
@@ -176,9 +198,7 @@ class AdminUserController extends AbstractController {
                 ]);
             } 
         // }
-        // else{
-          
-        // }
+        // else    // }
       }
     }
 
