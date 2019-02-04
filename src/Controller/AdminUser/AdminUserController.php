@@ -157,7 +157,7 @@ class AdminUserController extends AbstractController {
                         ->getRepository(User::class)
                         ->findByUsername($payload['username']);
       $setData = count($userObject) ? $userObject[0] : false;
-      if($setData){  
+      // if($setData){  
             try {
                 return new JsonResponse([
                     'success' => true,
@@ -175,7 +175,10 @@ class AdminUserController extends AbstractController {
                     'data'    => $setData
                 ]);
             } 
-        }
+        // }
+        // else{
+          
+        // }
       }
     }
 
@@ -192,39 +195,55 @@ class AdminUserController extends AbstractController {
              'adminUser'    => $request->request->get("adminUname") 
               ];
       $setData = [];  
-
-      $entityManager = $this->getDoctrine()->getManager();
-
-      $username = $entityManager->getRepository(User::class)->find($payload["username"]);
-      var_dump($username); die;
-      
-       try {
-        if($this->isAdmin($payload['adminUser'])){
-          // $user = new User();
-          $username = $entityManager->getRepository(User::class)->find($payload["username"]);
-          var_dump($username); die;
-          $entityManager = $this->getDoctrine()->getManager();
-
-          $username->setIsDeleted(true);
-          // $entityManager->persist($username);
-          $entityManager->flush();
+      if($this->isAdmin($payload['adminUser'])){
+        $user = $this->getDoctrine()
+                        ->getRepository(User::class)
+                        ->findByUsername($payload['username']);
+        // var_dump($user); die;
+        // $result = count($user) > 0 ? true : false;
+        if(!is_null($user)){
+            $entityManager = $this->getDoctrine()->getManager();
+            $user->setIsDeleted(1);
+            $entityManager->persist($user);
+            $entityManager->flush();
+            // $userObject = new User();
+            // $user = $this->getDoctrine()
+            //             ->getRepository(User::class)
+            //             ->deleteUser($payload['username']);
+            $setData = [
+              "isDeleted" => $user->getUsername()
+            ];
         }
-        return new JsonResponse([
-                  'success' => true,
-                  'code'    => "200",
-                  'message' => $this->getMessage("200"),
-                  'data'    => $setData
-              ]);
-          }
-          catch(\Exception $exception) {
-              
-              return new JsonResponse([
-                  'success' => false,
-                  'code'    => 403,
-                  'message' => $exception->getMessage(),
-                  'data'    => $setData
-              ]);
-          }
+        else{
+          $setData = [
+            "isDeleted" => $payload["username"]
+          ];
+        }
+      }
+      else{
+        $setData = [
+          "isDeleted" => $payload["username"]
+        ];
+      }
+
+         try {
+                return new JsonResponse([
+                    'success' => true,
+                    'code'    => "200",
+                    'message' => $this->getMessage("200"),
+                    'data'    => $setData
+                ]);
+            }
+            catch(\Exception $exception) {
+                
+                return new JsonResponse([
+                    'success' => false,
+                    'code'    => $exception->getCode(),
+                    'message' => $exception->getMessage(),
+                    'data'    => $setData
+                ]);
+            }
+
 
     }
 }

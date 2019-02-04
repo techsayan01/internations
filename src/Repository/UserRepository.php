@@ -31,16 +31,19 @@ class UserRepository extends ServiceEntityRepository
        return $returnResult;
     }
 
-    public function findByUsername($username = null): ?bool
+    public function findByUsername($username = null)
     {
         $returnResult   = false;
         $whereCondition = "p.username = '" . $username . "'"; 
+        // echo $username;
         if($username == null) return $returnResult;
         else{
             $qb = $this->createQueryBuilder('p')
-                       ->where("$whereCondition");
+                       ->where("$whereCondition")
+                       ->andWhere("p.is_deleted = 0");
             $queryObject = $qb->getQuery()->getResult();
-            $returnResult = $queryObject[0]->getIsDeleted() ? $queryObject : false;
+            var_dump($queryObject); die;
+            $returnResult = $queryObject[0];
         }
         return $returnResult;   
     }
